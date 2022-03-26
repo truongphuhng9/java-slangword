@@ -56,4 +56,13 @@ public class SlangWord {
 		}
 		return false;
 	}
+	public String toString() {
+		String result = this.slang + "=>";
+		for (String definition : definitions) {
+			result += "- ";
+			result += definition;
+			result += '\n';
+		}
+		return result;
+	}
 }
