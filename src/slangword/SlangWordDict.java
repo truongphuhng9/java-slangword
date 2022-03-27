@@ -9,6 +9,7 @@ public class SlangWordDict {
 	 * 
 	 * Reference: 
 	 * TreeMap definition and methods: https://www.javatpoint.com/java-treemap
+	 * Find substring
 	 * */
 	private TreeMap<String, ArrayList<String>> slangWordDict;
 	
@@ -17,7 +18,7 @@ public class SlangWordDict {
 	}
 	
 	public int add(String slang, ArrayList<String> definitions) {
-		if (this.containsKey(slangWord.getSlang())) {
+		if (this.containsKey(slang)) {
 			System.out.println("This word has already existed");
 			return -1;
 		}
@@ -38,7 +39,23 @@ public class SlangWordDict {
 	}
 	
 	public SlangWord searchBySlang(String slang) {
-		ArrayList<String> defs = this.slangWordDict.get(slang);
-		return new SlangWord(slang, defs);
+		if (this.slangWordDict.containsKey(slang)) {
+			ArrayList<String> defs = this.slangWordDict.get(slang);
+			return new SlangWord(slang, defs);
+		}
+		return null;
+	}
+
+	public ArrayList<SlangWord> searchByDefinition(String matchString) {
+		ArrayList<SlangWord> slangWordList = new ArrayList<>();
+		for (String slang : this.slangWordDict.keySet()) {
+			ArrayList<String> defs = this.slangWordDict.get(slang);
+			for (String def : defs) {
+				if (def.contains(matchString)) {
+					slangWordList.add(new SlangWord(slang, defs));
+				}
+			}
+		}
+		return slangWordList;
 	}
 }

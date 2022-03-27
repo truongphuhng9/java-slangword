@@ -18,11 +18,11 @@ public class SlangWordDictManager {
 		}
 		return instance;
 	}
-	public void load(String file) throws Exception {
-		System.out.println("Current Directory = " + System.getProperty("user.dir"));
-		System.out.println("Your slang DB path: ");
-		BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-		String filename = reader.readLine();
+	public void load(String filename) throws Exception {
+		//System.out.println("Current Directory = " + System.getProperty("user.dir"));
+		//System.out.println("Your slang DB path: ");
+		//BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+		//String filename = reader.readLine();
 		BufferedReader br = new BufferedReader(new FileReader(filename));
 		// Header not used
 		br.readLine();
@@ -80,10 +80,26 @@ public class SlangWordDictManager {
 			System.out.println("The word is not found");
 		} else {
 			System.out.println("The word is found");
-			System.out.println("The word: " + slangWord.getSlang());
-			System.out.println("The definitions: ");
-			for (String definition : slangWord.getDefinitions()) {
-				System.out.println(definition);
+			System.out.println(slangWord);
+		}
+	}
+
+	public void searchByDefinition() {
+		System.out.println("Enter the definition to be searched: ");
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		String definition = null;
+		try {
+			definition = br.readLine();
+		} catch (Exception e) {
+			System.out.println("Error: " + e.getMessage());
+		}
+		ArrayList<SlangWord> slangWords = slangWordDict.searchByDefinition(definition);
+		if (slangWords.size() == 0) {
+			System.out.println("The definition is not found");
+		} else {
+			System.out.println("The definition is found");
+			for (SlangWord slangWord : slangWords) {
+				System.out.println(slangWord);
 			}
 		}
 	}

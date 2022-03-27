@@ -4,7 +4,7 @@ import java.util.*;
 
 public class SlangWord {
 	private String slang;
-	private ArrayList<String> definitions;
+	private List<String> definitions;
 	
 	public SlangWord() {
 		this.slang = "";
@@ -20,11 +20,16 @@ public class SlangWord {
 		 * # Reference 
 		 * Split string => https://stackoverflow.com/questions/3481828/how-to-split-a-string-in-java
 		 * String[] to ArrayList => https://stackoverflow.com/questions/7347856/how-to-convert-a-string-into-an-arraylist
-		 * Find substring => 
+		 * Regular expresstion Split => https://javarevisited.blogspot.com/2016/02/2-ways-to-split-string-with-dot-in-java-using-regular-expression.html#axzz7OhxNaC52
 		*/
 		String[] parts = record.split("`");
 		this.slang = parts[0];
-		this.definitions = new ArrayList<>(Arrays.asList(parts[1].split("| ")));
+		if (parts[1].contains("|")) {
+			this.definitions = new ArrayList<String>(Arrays.asList(parts[1].toLowerCase().split("\\|")));
+		} else {
+			this.definitions = new ArrayList<>();
+			definitions.add(parts[1].toLowerCase());
+		}		
 	}
 	
 	public SlangWord(String slang, List<String> definitions) {
@@ -57,7 +62,7 @@ public class SlangWord {
 		return false;
 	}
 	public String toString() {
-		String result = this.slang + "=>";
+		String result = this.slang + " => ";
 		for (String definition : definitions) {
 			result += "- ";
 			result += definition;
