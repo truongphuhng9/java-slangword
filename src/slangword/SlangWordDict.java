@@ -16,20 +16,25 @@ public class SlangWordDict {
 		this.slangWordDict = new TreeMap<>();
 	}
 	
-	public void add(String slang, ArrayList<String> definitions) {
-		if (this.slangWordDict.containsKey(slang)) {
+	public int add(String slang, ArrayList<String> definitions) {
+		if (this.containsKey(slangWord.getSlang())) {
 			System.out.println("This word has already existed");
-			return;
+			return -1;
 		}
 		this.slangWordDict.put(slang, definitions);
+		return 0;
 	}
 	
-	public void add(SlangWord slangWord) {
-		if (this.slangWordDict.containsKey(slangWord.getSlang())) {
-			System.out.println("This word has already existed");
-			return;
+	public int add(SlangWord slangWord) {
+		if (this.containsKey(slangWord.getSlang())) {
+			return -1;
 		}
 		this.slangWordDict.put(slangWord.getSlang(), slangWord.getDefinitions());
+		return 0;
+	}
+
+	public boolean containsKey(String slang) {
+		return this.slangWordDict.containsKey(slang);
 	}
 	
 	public SlangWord searchBySlang(String slang) {
