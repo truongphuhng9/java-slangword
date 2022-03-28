@@ -73,6 +73,94 @@ public class SlangWordDictManager {
 			}
 		} while (true);
 	}
+
+	public void replaceAllDefinition() {
+		do {
+			try {
+				System.out.println("Enter the word to be edited: ");
+				BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+				String word = br.readLine();
+				ArrayList<String> definitions = new ArrayList<>();
+				do {
+					System.out.println("Enter the definition of the word: ");
+					String definition = br.readLine();
+					definitions.add(definition);
+					System.out.println("Do you want to add another definition? (y/n)");
+					String answer = br.readLine();
+					if (answer.equals("n")) break;
+				} while (true);
+
+				int status = slangWordDict.edit(word, definitions);
+				if (status == -1) {
+					System.out.println("This word has already existed");
+				} else if (status == 0) {
+					System.out.println("The word has been edited successfully");
+				}
+				System.out.println("Do you want to edit another slang word? (y/n)");
+				String answer = br.readLine();
+				if (answer.equals("n")) break;
+			} catch (Exception e) {
+				System.out.println("Error: " + e.getMessage());
+			}
+		} while (true);
+	}
+
+	public void addDefinitions() {
+		do {
+			try {
+				System.out.println("Enter the word to be edited: ");
+				BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+				String word = br.readLine();
+				ArrayList<String> definitions = new ArrayList<>();
+				do {
+					System.out.println("Enter the definition of the word: ");
+					String definition = br.readLine();
+					definitions.add(definition);
+					System.out.println("Do you want to add another definition? (y/n)");
+					String answer = br.readLine();
+					if (answer.equals("n")) break;
+				} while (true);
+
+				int status = slangWordDict.addDefinitions(word, definitions);
+				if (status == -1) {
+					System.out.println("This word has already existed");
+				} else if (status == 0) {
+					System.out.println("The word has been edited successfully");
+				}
+				System.out.println("Do you want to edit another slang word? (y/n)");
+				String answer = br.readLine();
+				if (answer.equals("n")) break;
+			} catch (Exception e) {
+				System.out.println("Error: " + e.getMessage());
+			}
+		} while (true);
+	}
+
+	public void editSpecifiedDefinition() {
+		do {
+			try {
+				System.out.println("Enter the word to be edited: ");
+				BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+				String word = br.readLine();
+				System.out.println("Enter the index of the definition to be edited: ");
+				int index = Integer.parseInt(br.readLine());
+				System.out.println("Enter the new definition: ");
+				String definition = br.readLine();
+
+				int status = slangWordDict.editSpecifiedDefinition(word, index, definition);
+				if (status == -1) {
+					System.out.println("This word has already existed");
+				} else if (status == 0) {
+					System.out.println("The word has been edited successfully");
+				}
+				System.out.println("Do you want to edit another slang word? (y/n)");
+				String answer = br.readLine();
+				if (answer.equals("n")) break;
+			} catch (Exception e) {
+				System.out.println("Error: " + e.getMessage());
+			}
+		} while (true);
+	}
 	
 	public void searchBySlangWord() {
 		System.out.println("Enter the slang word to be searched: ");
@@ -143,6 +231,12 @@ public class SlangWordDictManager {
 		System.out.println("2. Search by definition");
 		System.out.println("3. History");
 		System.out.println("4. Add a new slang word");
-		System.out.println("5. Exit");
+		System.out.println("5. Edit a slang word");
+		System.out.println("6. Exit");
+	}
+
+	public void exit() {
+		System.out.println("Bye!");
+		System.exit(0);
 	}
 }

@@ -62,12 +62,15 @@ public class SlangWord {
 		return false;
 	}
 	public String toString() {
-		String result = this.slang + " => ";
-		for (String definition : definitions) {
-			result += "- ";
-			result += definition;
-			result += '\n';
+		StringBuilder sb = new StringBuilder();
+		sb.append(this.slang);
+		sb.append("`");
+		for (int i = 0; i < this.definitions.size(); i++) {
+			sb.append(this.definitions.get(i));
+			if (i != this.definitions.size() - 1) {
+				sb.append("|");
+			}
 		}
-		return result;
+		return sb.toString();
 	}
 }

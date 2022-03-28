@@ -34,6 +34,43 @@ public class SlangWordDict {
 		return 0;
 	}
 
+	public int edit(String slang, ArrayList<String> definitions) {
+		if (!this.containsKey(slang)) {
+			System.out.println("This word has not existed");
+			return -1;
+		}
+		this.slangWordDict.put(slang, definitions);
+		return 0;
+	}
+
+	public int addDefinitions(String slang, ArrayList<String> definitions) {
+		if (!this.containsKey(slang)) {
+			System.out.println("This word has not existed");
+			return -1;
+		}
+		this.slangWordDict.get(slang).addAll(definitions);
+		return 0;
+	}
+
+	public int editSpecifiedDefinition(String slang, int index, String definition) {
+		if (!this.containsKey(slang)) {
+			System.out.println("This word has not existed");
+			return -1;
+		}
+		ArrayList<String> definitions = this.slangWordDict.get(slang);
+		definitions.set(index, definition);
+		this.slangWordDict.put(slang, definitions);
+		return 0;
+	}
+
+	public int edit(SlangWord slangWord) {
+		if (!this.containsKey(slangWord.getSlang())) {
+			return -1;
+		}
+		this.slangWordDict.put(slangWord.getSlang(), slangWord.getDefinitions());
+		return 0;
+	}
+
 	public boolean containsKey(String slang) {
 		return this.slangWordDict.containsKey(slang);
 	}
