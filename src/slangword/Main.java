@@ -54,6 +54,12 @@ public class Main {
 				}				
 				break;
 			case "6":
+				manager.removeSlangWord();
+				break;
+			case "7":
+				manager.resetToDefault();
+				break;
+			case "8":
 				manager.exit();
 				break;
 			default:

@@ -16,6 +16,13 @@ public class SlangWordDict {
 	public SlangWordDict() {
 		this.slangWordDict = new TreeMap<>();
 	}
+
+	public SlangWord get(String slang) {
+		if (this.slangWordDict.containsKey(slang)) {
+			return new SlangWord(slang, this.slangWordDict.get(slang));
+		}
+		return null;
+	}
 	
 	public int add(String slang, ArrayList<String> definitions) {
 		if (this.containsKey(slang)) {
@@ -34,9 +41,8 @@ public class SlangWordDict {
 		return 0;
 	}
 
-	public int edit(String slang, ArrayList<String> definitions) {
+	public int replaceAllDefinition(String slang, ArrayList<String> definitions) {
 		if (!this.containsKey(slang)) {
-			System.out.println("This word has not existed");
 			return -1;
 		}
 		this.slangWordDict.put(slang, definitions);
@@ -63,11 +69,11 @@ public class SlangWordDict {
 		return 0;
 	}
 
-	public int edit(SlangWord slangWord) {
-		if (!this.containsKey(slangWord.getSlang())) {
+	public int remove(String slang) {
+		if (!this.containsKey(slang)) {
 			return -1;
 		}
-		this.slangWordDict.put(slangWord.getSlang(), slangWord.getDefinitions());
+		this.slangWordDict.remove(slang);
 		return 0;
 	}
 
@@ -94,5 +100,14 @@ public class SlangWordDict {
 			}
 		}
 		return slangWordList;
+	}
+
+	public SlangWordDict deepClone() {
+		SlangWordDict newDict = new SlangWordDict();
+		for (String slang : this.slangWordDict.keySet()) {
+			ArrayList<String> defs = this.slangWordDict.get(slang);
+			newDict.add(slang, defs);
+		}
+		return newDict;
 	}
 }

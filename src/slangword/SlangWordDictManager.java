@@ -11,12 +11,12 @@ import java.util.Map;
 public class SlangWordDictManager {
 	private static SlangWordDictManager instance = null;
 	private SlangWordDict slangWordDict;
-	private SlangWordDict backupSlangWordDict;
+	private SlangWordDict defaultSlangWordDict;
 	private HashMap<Date, ArrayList<SlangWord>> searchSlangHistory;
 	
 	private SlangWordDictManager() {
 		this.slangWordDict = new SlangWordDict();
-		this.backupSlangWordDict = new SlangWordDict();
+		this.defaultSlangWordDict = new SlangWordDict();
 		this.searchSlangHistory = new HashMap<>();
 	}
 	public static SlangWordDictManager getInstance() {
@@ -38,7 +38,7 @@ public class SlangWordDictManager {
 			if (row == null) break;
 			SlangWord slangWord = new SlangWord(row);
 			slangWordDict.add(slangWord);
-			backupSlangWordDict.add(slangWord);			
+			defaultSlangWordDict.add(slangWord);			
 		}
 		br.close();
 	}	
@@ -81,21 +81,23 @@ public class SlangWordDictManager {
 				BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 				String word = br.readLine();
 				ArrayList<String> definitions = new ArrayList<>();
-				do {
-					System.out.println("Enter the definition of the word: ");
-					String definition = br.readLine();
-					definitions.add(definition);
-					System.out.println("Do you want to add another definition? (y/n)");
-					String answer = br.readLine();
-					if (answer.equals("n")) break;
-				} while (true);
-
-				int status = slangWordDict.edit(word, definitions);
-				if (status == -1) {
-					System.out.println("This word has already existed");
-				} else if (status == 0) {
+				if (slangWordDict.containsKey(word)) {
+					do {
+						SlangWord slangWord = this.slangWordDict.get(word);
+						System.out.println(slangWord);
+						System.out.println("Enter the new definition of the word: ");
+						String definition = br.readLine();
+						definitions.add(definition);
+						System.out.println("Do you want to add another definition? (y/n)");
+						String answer = br.readLine();
+						if (answer.equals("n")) break;
+					} while (true);
+					slangWordDict.replaceAllDefinition(word, definitions);
 					System.out.println("The word has been edited successfully");
+				} else {
+					System.out.println("The word does not exist");
 				}
+				
 				System.out.println("Do you want to edit another slang word? (y/n)");
 				String answer = br.readLine();
 				if (answer.equals("n")) break;
@@ -112,21 +114,23 @@ public class SlangWordDictManager {
 				BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 				String word = br.readLine();
 				ArrayList<String> definitions = new ArrayList<>();
-				do {
-					System.out.println("Enter the definition of the word: ");
-					String definition = br.readLine();
-					definitions.add(definition);
-					System.out.println("Do you want to add another definition? (y/n)");
-					String answer = br.readLine();
-					if (answer.equals("n")) break;
-				} while (true);
-
-				int status = slangWordDict.addDefinitions(word, definitions);
-				if (status == -1) {
-					System.out.println("This word has already existed");
-				} else if (status == 0) {
+				if (slangWordDict.containsKey(word)) {
+					do {
+						SlangWord slangWord = this.slangWordDict.get(word);
+						System.out.println(slangWord);
+						System.out.println("Enter the new definition of the word: ");
+						String definition = br.readLine();
+						definitions.add(definition);
+						System.out.println("Do you want to add another definition? (y/n)");
+						String answer = br.readLine();
+						if (answer.equals("n")) break;
+					} while (true);
+					slangWordDict.addDefinitions(word, definitions);
 					System.out.println("The word has been edited successfully");
+				} else {
+					System.out.println("The word does not exist");
 				}
+			
 				System.out.println("Do you want to edit another slang word? (y/n)");
 				String answer = br.readLine();
 				if (answer.equals("n")) break;
@@ -142,18 +146,48 @@ public class SlangWordDictManager {
 				System.out.println("Enter the word to be edited: ");
 				BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 				String word = br.readLine();
-				System.out.println("Enter the index of the definition to be edited: ");
-				int index = Integer.parseInt(br.readLine());
-				System.out.println("Enter the new definition: ");
-				String definition = br.readLine();
-
-				int status = slangWordDict.editSpecifiedDefinition(word, index, definition);
-				if (status == -1) {
-					System.out.println("This word has already existed");
-				} else if (status == 0) {
+				if (slangWordDict.containsKey(word)) {
+					SlangWord slangWord = this.slangWordDict.get(word);
+					System.out.println(slangWord);
+					System.out.println("Enter the index of the definition to be edited: ");
+					BufferedReader br2 = new BufferedReader(new InputStreamReader(System.in));
+					int index = Integer.parseInt(br2.readLine());
+					System.out.println("Enter the new definition of the word: ");
+					String definition = br.readLine();
+					slangWordDict.editSpecifiedDefinition(word, index, definition);
 					System.out.println("The word has been edited successfully");
+				} else {
+					System.out.println("The word does not exist");
 				}
 				System.out.println("Do you want to edit another slang word? (y/n)");
+				String answer = br.readLine();
+				if (answer.equals("n")) break;
+			} catch (Exception e) {
+				System.out.println("Error: " + e.getMessage());
+			}
+		} while (true);
+	}
+
+	public void removeSlangWord() {
+		do {
+			try {
+				System.out.println("Enter the word to be removed: ");
+				BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+				String word = br.readLine();
+				if (slangWordDict.containsKey(word)) {
+					// Confirm removal
+					System.out.println("Are you sure you want to remove the word? (y/n)");
+					String answer = br.readLine();
+					if (answer.equals("y")) {
+						slangWordDict.remove(word);
+						System.out.println("The word has been removed successfully");
+					} else {
+						System.out.println("The word has not been removed");
+					}
+				} else {
+					System.out.println("The word does not exist");
+				}
+				System.out.println("Do you want to remove another slang word? (y/n)");
 				String answer = br.readLine();
 				if (answer.equals("n")) break;
 			} catch (Exception e) {
@@ -208,7 +242,7 @@ public class SlangWordDictManager {
 		for (Map.Entry<Date, ArrayList<SlangWord>> entry : this.searchSlangHistory.entrySet()) {
 			System.out.println("-------Date " + entry.getKey() + "-------");
 			for (SlangWord slangWord : entry.getValue()) {
-				System.out.println(slangWord);
+				System.out.println("- " + slangWord);
 			}
 		}
 	}
@@ -224,6 +258,11 @@ public class SlangWordDictManager {
 			slangWords.add(slangWord);
 			searchSlangHistory.put(date, slangWords);
 		}
+	}
+
+	public void resetToDefault() {
+		this.slangWordDict = this.defaultSlangWordDict.deepClone();
+		System.out.println("The dictionary has been reset to default");
 	}
 
 	public void printMenu() {
