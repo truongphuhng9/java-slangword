@@ -61,6 +61,11 @@ public class SlangWord {
 		}
 		return false;
 	}
+
+	public boolean containsDefinition(String definition) {
+		return this.definitions.contains(definition);
+	}
+
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append(this.slang);

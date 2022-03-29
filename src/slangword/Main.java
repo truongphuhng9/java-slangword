@@ -60,6 +60,15 @@ public class Main {
 				manager.resetToDefault();
 				break;
 			case "8":
+				manager.randomWordOfTheDay();
+				break;
+			case "9":
+				manager.quizByWord();
+				break;
+			case "10":
+				manager.quizByDefinition();
+				break;
+			case "11":
 				manager.exit();
 				break;
 			default:

@@ -23,6 +23,10 @@ public class SlangWordDict {
 		}
 		return null;
 	}
+
+	public int size() {
+		return this.slangWordDict.size();
+	}
 	
 	public int add(String slang, ArrayList<String> definitions) {
 		if (this.containsKey(slang)) {
@@ -80,16 +84,8 @@ public class SlangWordDict {
 	public boolean containsKey(String slang) {
 		return this.slangWordDict.containsKey(slang);
 	}
-	
-	public SlangWord searchBySlang(String slang) {
-		if (this.slangWordDict.containsKey(slang)) {
-			ArrayList<String> defs = this.slangWordDict.get(slang);
-			return new SlangWord(slang, defs);
-		}
-		return null;
-	}
 
-	public ArrayList<SlangWord> searchByDefinition(String matchString) {
+	public ArrayList<SlangWord> getByDefinition(String matchString) {
 		ArrayList<SlangWord> slangWordList = new ArrayList<>();
 		for (String slang : this.slangWordDict.keySet()) {
 			ArrayList<String> defs = this.slangWordDict.get(slang);
@@ -102,6 +98,14 @@ public class SlangWordDict {
 		return slangWordList;
 	}
 
+	public Set<Map.Entry<String, ArrayList<String>>> entrySet() {
+		return this.slangWordDict.entrySet();
+	}
+
+	public Set<String> keySet() {
+		return this.slangWordDict.keySet();
+	}
+	
 	public SlangWordDict deepClone() {
 		SlangWordDict newDict = new SlangWordDict();
 		for (String slang : this.slangWordDict.keySet()) {

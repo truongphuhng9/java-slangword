@@ -1,19 +1,24 @@
 package slangword;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
+import java.util.Set;
 
 public class SlangWordDictManager {
 	private static SlangWordDictManager instance = null;
 	private SlangWordDict slangWordDict;
 	private SlangWordDict defaultSlangWordDict;
 	private HashMap<Date, ArrayList<SlangWord>> searchSlangHistory;
-	
+
 	private SlangWordDictManager() {
 		this.slangWordDict = new SlangWordDict();
 		this.defaultSlangWordDict = new SlangWordDict();
@@ -38,11 +43,11 @@ public class SlangWordDictManager {
 			if (row == null) break;
 			SlangWord slangWord = new SlangWord(row);
 			slangWordDict.add(slangWord);
-			defaultSlangWordDict.add(slangWord);			
+			defaultSlangWordDict.add(slangWord);
 		}
 		br.close();
 	}	
-	
+
 	public void addSlangWord() {
 		do {
 			try {
@@ -50,6 +55,10 @@ public class SlangWordDictManager {
 				BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 				String word = br.readLine();
 				ArrayList<String> definitions = new ArrayList<>();
+				if (slangWordDict.containsKey(word)) {
+					System.out.println("The word already exists!");
+					return;
+				}
 				do {
 					System.out.println("Enter the definition of the word: ");
 					String definition = br.readLine();
@@ -206,7 +215,7 @@ public class SlangWordDictManager {
 			System.out.println("Error: " + e.getMessage());
 		}
 		Date date = new Date();
-		SlangWord slangWord = slangWordDict.searchBySlang(slang);
+		SlangWord slangWord = this.slangWordDict.get(slang);
 		if (slangWord == null) {
 			System.out.println("The word is not found");
 		} else {
@@ -226,7 +235,8 @@ public class SlangWordDictManager {
 			System.out.println("Error: " + e.getMessage());
 		}
 		Date date = new Date();
-		ArrayList<SlangWord> slangWords = slangWordDict.searchByDefinition(definition);
+
+		ArrayList<SlangWord> slangWords = slangWordDict.getByDefinition(definition);
 		if (slangWords.size() == 0) {
 			System.out.println("The definition is not found");
 		} else {
@@ -265,13 +275,161 @@ public class SlangWordDictManager {
 		System.out.println("The dictionary has been reset to default");
 	}
 
+	public void randomWordOfTheDay() {
+		SlangWord slangWord = this.getRandomSlangWord();
+		System.out.println("The word of the day: ");
+		System.out.println(slangWord);
+	}
+
+	public SlangWord getRandomSlangWord() {
+		Random random = new Random();
+		int index = random.nextInt(this.slangWordDict.size());
+		ArrayList<String> words = new ArrayList<>(this.slangWordDict.keySet());
+		if (words.size() == 0) {
+			return null;
+		} else {
+			String word = words.get(index);
+			return this.slangWordDict.get(word);
+		}
+	}
+
+	public void saveToFile(String fileName) {
+		try {
+			BufferedWriter bw = new BufferedWriter(new FileWriter(fileName));
+			bw.write("Slang`Meaning");
+			for (Map.Entry<String, ArrayList<String>> entry : this.slangWordDict.entrySet()) {
+				SlangWord slangWord = new SlangWord(entry.getKey(), entry.getValue());
+				bw.write(slangWord.toString());
+				bw.newLine();
+			}
+			bw.close();
+		} catch (Exception e) {
+			System.out.println("Error: " + e.getMessage());
+		}
+	}
+
+	public void quizByWord() {
+		SlangWord question = this.getRandomSlangWord();
+		ArrayList<String> answers = new ArrayList<>();
+
+		// Generate the question and 4 answers
+		if (question == null) {
+			System.out.println("The dictionary is empty");
+		} else {
+			for (int i = 0; i < 3; ++i) {
+				SlangWord randomSlangWord = this.getRandomSlangWord();
+				if (question.getSlang().equals(randomSlangWord.getSlang())) {
+					--i;
+				} else {
+					ArrayList<String> definitions = randomSlangWord.getDefinitions();
+					int index = new Random().nextInt(definitions.size());
+					answers.add(definitions.get(index));
+				}
+			}
+			ArrayList<String> definitions = question.getDefinitions();
+			int index = new Random().nextInt(definitions.size());
+			answers.add(definitions.get(index));
+			Collections.shuffle(answers);
+
+			// Find the index of correct answer
+			int correctIndex = 0;
+			for (int i = 0; i < answers.size(); ++i) {
+				if (question.containsDefinition(answers.get(i))) {
+					correctIndex = i;
+					break;
+				}
+			}
+
+			System.out.println("The word: " + question.getSlang());
+			System.out.println("What is the correct definition?");
+			for (int i = 0; i < answers.size(); ++i) {
+				System.out.println("(" + (i + 1) + ") " + answers.get(i));
+			}
+			System.out.println("Enter your answer: ");
+			BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+			int yourAnswer;
+
+			do {
+				try {
+					yourAnswer = Integer.parseInt(br.readLine());
+				} catch (Exception e) {
+					System.out.println("Error: " + e.getMessage());
+					yourAnswer = -1;
+				}
+			} while (yourAnswer < 1 || yourAnswer > 4);
+			if (yourAnswer == correctIndex + 1) {
+				System.out.println("Correct!");
+			} else {
+				System.out.println("Wrong! The correct answer is: " + answers.get(correctIndex));
+			}
+		}
+	}
+
+	public void quizByDefinition() {
+		SlangWord question = this.getRandomSlangWord();
+		ArrayList<String> answers = new ArrayList<>();
+
+		// Generate the question and 4 answers
+		if (question == null) {
+			System.out.println("The dictionary is empty");
+		} else {
+			for (int i = 0; i < 3; ++i) {
+				SlangWord randomSlangWord = this.getRandomSlangWord();
+				if (question.getSlang().equals(randomSlangWord.getSlang())) {
+					--i;
+				} else {
+					answers.add(randomSlangWord.getSlang());
+				}
+			}
+			answers.add(question.getSlang());
+			Collections.shuffle(answers);
+
+			// Find the index of correct answer
+			int correctIndex = 0;
+			for (int i = 0; i < answers.size(); ++i) {
+				if (question.getSlang().equals(answers.get(i))) {
+					correctIndex = i;
+					break;
+				}
+			}
+
+			System.out.println("The definition: " + question.getDefinitions().get(0));
+			System.out.println("What is the correct word?");
+			for (int i = 0; i < answers.size(); ++i) {
+				System.out.println("(" + (i + 1) + ") " + answers.get(i));
+			}
+			System.out.println("Enter your answer: ");
+			BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+			int yourAnswer;
+
+			do {
+				try {
+					yourAnswer = Integer.parseInt(br.readLine());
+				} catch (Exception e) {
+					System.out.println("Error: " + e.getMessage());
+					yourAnswer = -1;
+				}
+			} while (yourAnswer < 1 || yourAnswer > 4);
+			if (yourAnswer == correctIndex + 1) {
+				System.out.println("Correct!");
+			} else {
+				System.out.println("Wrong! The correct answer is: " + answers.get(correctIndex));
+			}
+		}
+	}
+
 	public void printMenu() {
 		System.out.println("1. Search by slang word");
 		System.out.println("2. Search by definition");
 		System.out.println("3. History");
 		System.out.println("4. Add a new slang word");
 		System.out.println("5. Edit a slang word");
-		System.out.println("6. Exit");
+		System.out.println("6. Remove a slang word");
+		System.out.println("7. Reset to default");
+		System.out.println("8. Random word");
+		System.out.println("9. Quiz by word");
+		System.out.println("10. Quiz by definition");
+		System.out.println("11. Exit");
 	}
 
 	public void exit() {
