@@ -5,7 +5,7 @@ import java.io.*;
 public class Main {	
 	public static void main(String[] args) throws Exception {
 		SlangWordDictManager manager = SlangWordDictManager.getInstance();
-		manager.load("./data/slang.txt");
+		manager.load();
 		while (true) {
 			manager.printMenu();
 			System.out.println("Your option: ");

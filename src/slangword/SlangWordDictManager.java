@@ -1,17 +1,12 @@
 package slangword;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 
 public class SlangWordDictManager {
 	private static SlangWordDictManager instance = null;
@@ -30,23 +25,6 @@ public class SlangWordDictManager {
 		}
 		return instance;
 	}
-	public void load(String filename) throws Exception {
-		//System.out.println("Current Directory = " + System.getProperty("user.dir"));
-		//System.out.println("Your slang DB path: ");
-		//BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-		//String filename = reader.readLine();
-		BufferedReader br = new BufferedReader(new FileReader(filename));
-		// Header not used
-		br.readLine();
-		while (true) {
-			String row = br.readLine();
-			if (row == null) break;
-			SlangWord slangWord = new SlangWord(row);
-			slangWordDict.add(slangWord);
-			defaultSlangWordDict.add(slangWord);
-		}
-		br.close();
-	}	
 
 	public void addSlangWord() {
 		do {
@@ -72,6 +50,7 @@ public class SlangWordDictManager {
 				if (status == -1) {
 					System.out.println("This word has already existed");
 				} else if (status == 0) {
+					this.saveDict();
 					System.out.println("The word has been added successfully");
 				}
 				System.out.println("Do you want to add another slang word? (y/n)");
@@ -102,6 +81,7 @@ public class SlangWordDictManager {
 						if (answer.equals("n")) break;
 					} while (true);
 					slangWordDict.replaceAllDefinition(word, definitions);
+					this.saveDict();
 					System.out.println("The word has been edited successfully");
 				} else {
 					System.out.println("The word does not exist");
@@ -135,6 +115,7 @@ public class SlangWordDictManager {
 						if (answer.equals("n")) break;
 					} while (true);
 					slangWordDict.addDefinitions(word, definitions);
+					this.saveDict();
 					System.out.println("The word has been edited successfully");
 				} else {
 					System.out.println("The word does not exist");
@@ -164,6 +145,7 @@ public class SlangWordDictManager {
 					System.out.println("Enter the new definition of the word: ");
 					String definition = br.readLine();
 					slangWordDict.editSpecifiedDefinition(word, index, definition);
+					this.saveDict();
 					System.out.println("The word has been edited successfully");
 				} else {
 					System.out.println("The word does not exist");
@@ -189,6 +171,7 @@ public class SlangWordDictManager {
 					String answer = br.readLine();
 					if (answer.equals("y")) {
 						slangWordDict.remove(word);
+						this.saveDict();
 						System.out.println("The word has been removed successfully");
 					} else {
 						System.out.println("The word has not been removed");
@@ -222,6 +205,7 @@ public class SlangWordDictManager {
 			System.out.println("The word is found");
 			System.out.println(slangWord);
 			this.recordHistory(date, slangWord);
+			this.saveHistory();
 		}
 	}
 
@@ -245,6 +229,7 @@ public class SlangWordDictManager {
 				System.out.println(slangWord);
 				this.recordHistory(date, slangWord);
 			}
+			this.saveHistory();
 		}
 	}
 
@@ -293,19 +278,96 @@ public class SlangWordDictManager {
 		}
 	}
 
-	public void saveToFile(String fileName) {
+	public void saveDict() {
 		try {
-			BufferedWriter bw = new BufferedWriter(new FileWriter(fileName));
-			bw.write("Slang`Meaning");
-			for (Map.Entry<String, ArrayList<String>> entry : this.slangWordDict.entrySet()) {
-				SlangWord slangWord = new SlangWord(entry.getKey(), entry.getValue());
-				bw.write(slangWord.toString());
-				bw.newLine();
-			}
-			bw.close();
+			FileOutputStream fos = new FileOutputStream("./data/slang_word_dictionary.ser");
+			ObjectOutputStream oos = new ObjectOutputStream(fos);
+			oos.writeObject(this.slangWordDict);
+			System.out.println("The dictionary has been saved");
+			oos.close();
+			fos.close();
+			System.out.println("The dictionary has been saved");
 		} catch (Exception e) {
 			System.out.println("Error: " + e.getMessage());
 		}
+	}
+
+	public void loadDict() {
+		try {
+			FileInputStream fis = new FileInputStream("./data/slang_word_dictionary.ser");
+			ObjectInputStream ois = new ObjectInputStream(fis);
+			this.slangWordDict = (SlangWordDict) ois.readObject();
+			ois.close();
+			fis.close();
+			System.out.println("The dictionary has been loaded");
+		} catch (Exception e) {
+			System.out.println("Error: " + e.getMessage());
+		}
+	}
+
+	public void saveHistory() {
+		try {
+			FileOutputStream fos = new FileOutputStream("./data/slang_word_history.ser");
+			ObjectOutputStream oos = new ObjectOutputStream(fos);
+			oos.writeObject(this.searchSlangHistory);
+			oos.close();
+			fos.close();
+			System.out.println("The history has been saved");
+		} catch (Exception e) {
+			System.out.println("Error: " + e.getMessage());
+		}
+	}
+
+	public void loadHistory() {
+		try {
+			FileInputStream fis = new FileInputStream("./data/slang_word_history.ser");
+			ObjectInputStream ois = new ObjectInputStream(fis);
+			HashMap<Date, ArrayList<SlangWord>> readObject = (HashMap<Date, ArrayList<SlangWord>>) ois.readObject();
+			this.searchSlangHistory = readObject;
+			ois.close();
+			fis.close();
+			System.out.println("The history has been loaded");
+		} catch (Exception e) {
+			System.out.println("Error: " + e.getMessage());
+		}
+	}
+
+	public void loadDefault(String filename) throws Exception {
+		BufferedReader br = new BufferedReader(new FileReader(filename));
+		// Header not used
+		br.readLine();
+		while (true) {
+			String row = br.readLine();
+			if (row == null) break;
+			SlangWord slangWord = new SlangWord(row);
+			defaultSlangWordDict.add(slangWord);
+		}
+		br.close();
+	}
+
+	public void load() throws Exception {
+		// chech file exist
+		loadDefault("./data/slang.txt");
+		File fileDict = new File("./data/slang_word_dictionary.ser");
+		if (fileDict.exists()) {
+			try {
+				this.loadDict();
+			} catch (Exception e) {
+				System.out.println("Error: " + e.getMessage());
+			}
+		} else {
+			this.slangWordDict = this.defaultSlangWordDict.deepClone();
+		}
+
+		File fileHistory = new File("./data/slang_word_history.ser");
+		if (fileHistory.exists()) {
+			try {
+				this.loadHistory();
+			} catch (Exception e) {
+				System.out.println("Error: " + e.getMessage());
+			}
+		}
+		
 	}
 
 	public void quizByWord() {
